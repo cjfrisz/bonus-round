@@ -1,0 +1,119 @@
+Bonus Round is a cross-platform backup and syncing utility written by
+Chris Frisz. Its intended to back up and sync video game save files
+across computers with a minimal amount of setup and upkeep. At its
+core, Bonus Round is a set of scripts operating on a Git
+back-end. Bonus Round requires these utilities to be installed on the
+system:
+	Perl
+	Git
+
+It can be used as follows:
+
+1. Global setup
+
+   The file "setup.pl" is a Perl script for performing the global
+   setup for Bonus Round. This creates the "bonus-round" directory in
+   $HOME on Linux and Mac OSX, and %UserProfile% on Windows. This
+   contains the master Git repository, as well as the registration
+   script for adding new games to Bonus Round and the game-runner
+   script for ensuring that save file stay up-to-date. 
+
+   For the application to work correctly, it requires a remote Git
+   repository to be available. It's recommended that this be set up on
+   a private server, though Git repositories can be hosted remotely on
+   the Github website at www.github.com for free with account
+   registration. The only disadvantage to this setup is that save
+   files are visible to all Github visitors unless a private
+   repository is used (note this requires a paid Github account).
+
+   Global setup should be performed once for each computer on which
+   Bonus Round will be used. Currently, it requires the following
+   options:
+
+	-r REPO, --repo REPO, --repo=REPO
+		The remote repository which Bonus Round will use for
+		its entire operation. REPO should resolve to a remote
+		Git repository, 
+
+		Examples:
+		-r git@github.com:user/repo.git,
+		--repo=ssh://personal-server.com/repo.git
+
+2. Game registration
+
+   Each game used with Bonus Round requires a one-time registration
+   before save files can be backed up and synced. This is accomplished
+   using the "register.pl" script located in the "bonus-round"
+   directory created during global setup. 
+
+   Registration creates a repository for the save files where they are
+   stored. For situations in which the registration is the first for
+   the game (that is, no other computer using Bonus Round has save
+   files for the game), this repository is added as a submodule of the
+   global repository.  Otherwise, Bonus Round checks out the existing
+   set of save files for the game from the global repository and tries
+   to non-destructively merge the files from the repository with the
+   existing ones on the system. If there are any conflicts (i.e. save
+   files with different time stamps with the same name), the
+   registration script will interactively request whether to keep the
+   local file, the remote one, or both by renaming both files to
+   indicate the local versus remote versions.
+
+   Once registration is complete, a shortcut will be created that
+   should be used whenever playing the game to ensure that the most
+   up-to-date save games are used and that they get properly after the
+   game exits.
+
+   The registration script, "register.pl," should be run once for each
+   game on each system from which it will be played and requires the
+   following options:
+
+	-n NAME, --name NAME, --name=NAME
+		The name by which Bonus Round references the
+		game. When used with the -i flag, the game is assigned
+		NAME for the submodule within the global
+		repository. Otherwise, NAME must refer to a
+		previously-registered game on another system.
+
+	-d DIR, --dir DIR, --dir=DIR
+		The path to the directory containing the save game
+		files.
+
+	-e EXE, --exe EXE, --exe=EXE
+		The executable used to run the game. This is used for
+		creating the shortcut used to keep save files
+		up-to-date.
+
+   Additionally, the registration script accepts these optional flags:
+
+	-i, --init
+		Indicates that this is the first time the game is
+		being registered on any system using Bonus Round. This
+		will result in a new submodule being added to the
+		global Bonus Round repository
+
+	-f FILES*, --files FILES*
+		FILES* may be one or more file extensions for the save
+		files in the directory. For example, one such
+		extension may be "sav" where the save files have names
+		such as "game1.sav." By default, the registration
+		script adds all files in the save file directory to
+		the repository. 
+
+		This option is useful if a game creates multiple save
+		file types and only some are necessary. This is also
+		useful for some older games where save files are saved
+		in the same directory as game execution files (which do
+		not need to be synchronized using Bonus Round).
+
+
+
+3. Play games!
+   
+   Once a game is registered, a shortcut will be created that should
+   be used whenever the game is played. This shortcut calls a script,
+   runner.pl, with arguments specific to the game that first makes
+   sure that the save files are up to date with the ones stroed in the
+   global repository, then runs the game. When the game is
+   finished, the script updates the global repository with any changes
+   to the save games.
