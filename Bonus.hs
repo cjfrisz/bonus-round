@@ -31,23 +31,30 @@
 
 module Bonus (main) where 
 
-import qualified System.Console.CmdArgs
+import System.Console.CmdArgs
 import System.FilePath
 
-data Mode = Add {name :: String, saveDir :: FilePath, fileTypes :: [String], app :: FilePath}
-          | Register {name :: String, saveDir :: FilePath, app :: FilePath}
+data Mode = Add {appName :: String, saveDir :: FilePath, fileTypes :: [String], app :: FilePath}
+          | Register {appName :: String, saveDir :: FilePath, app :: FilePath}
+          | Run {appName :: String}
              deriving (Data, Typeable, Show)
                       
 add = Add 
-    {name = def &= typ "NAME" &= help "Name used for the game within Bonus Round"
+    {appName = def &= typ "NAME" &= help "Name used for the game within Bonus Round"
     ,saveDir = def &= typFile &= help "Directory where save files are stored"
     ,fileTypes = def &= typ "EXT_1 ... EXT_n" &= "File extension(s) (i.e. file.EXT) for save files."
     ,app = def &= typFile &= help "Path to the application"
     } &= help "Add an application to Bonus Round."
     
 register = Register
-    {name = def &= typ "NAME" &= help "Name as previously used to register the application"           
+    {appName = def &= typ "NAME" &= help "Name as previously used to register the application"           
     ,saveDir = def &= typFile &= help "Directory where save files are stored"
     ,app = def &= typFile &= help "Path to the application"
     } &= help "Register a previously-added application on a new computer."
-                  
+    
+run = Run
+    {appName = def &= typ "NAME" &= help "Name of the application to run"} &= help "Run an application registered with Bonus Round."
+    
+mode = cmdArgsMode $ modes [add, register, run]
+
+main = print =<< mode

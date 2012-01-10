@@ -20,3 +20,4 @@ Maintainer:		cjfrisz@chrisfrisz.com
 
 Executable bonus
   Main-is:		Bonus.hs
+  Build-Depends:	cmdargs >= 0.9
