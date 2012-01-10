@@ -1,0 +1,22 @@
+{-
+----------------------------------------------------------------------
+- File bonus.cabal	
+- Written by Chris Frisz	
+- 	    
+- Created  9 Jan 2012	
+- Last modified 10 Jan 2012	
+- 	 
+- The file bonus.cabal is the Cabal build file for Bonus Round.
+---------------------------------------------------------------------
+-}
+
+Name:			bonus
+Version:		0.0
+Description:		Synch and back up video game save files.
+License:		GPLv3
+License-file:		COPYING
+Author:			Chris Frisz
+Maintainer:		cjfrisz@chrisfrisz.com
+
+Executable bonus
+  Main-is:		Bonus.hs
